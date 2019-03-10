@@ -27,7 +27,7 @@ class RtspServer {
     conn.on("data", buf => this.onConnData(buf, conn));
     conn.once("close", this.onConnClose);
     conn.on("error", this.onConnError);
-  };
+  }
 
   private onConnData = (req: Buffer, conn: net.Socket) => {
     let tcpString = req.toString("utf8");
@@ -130,17 +130,19 @@ class RtspServer {
         response += this.rtspDate();
 
         const scriptCmd =
-          "gst-launch-1.0 -v videotestsrc pattern=" +
+          "gst-launch-1.0 rtpbin name=rtpbin " +
+          "videotestsrc pattern=" +
           streamIdentifer +
           " ! " +
-          "video/x-raw,framerate=30/1 ! videoconvert ! " +
-          "x264enc tune=zerolatency ! rtph264pay ! " +
-          "udpsink host=" +
-          this.getRemoteAddress(conn) +
-          " port=" +
-          this.sessions.get(headers.get("Session") || "")!.rtpPort;
+          "video/x-raw,framerate=30/1 ! videoconvert ! x264enc ! rtph264pay ! rtpbin.send_rtp_sink_0 " +
+          "rtpbin.send_rtp_src_0 ! udpsink port=" +
+          this.sessions.get(headers.get("Session") || "")!.rtpPort +
+          " rtpbin.send_rtcp_src_0 ! udpsink port=" +
+          this.sessions.get(headers.get("Session") || "")!.rtcpPort +
+          " sync=false async=false";
+
         console.log(scriptCmd);
-        shell.exec(scriptCmd, { async: true, silent: true });
+        shell.exec(scriptCmd, { async: true, silent: false });
         break;
       case "TEARDOWN":
         // TEARDOWN rtsp://localhost:8554/live.sdp/ RTSP/1.0
@@ -164,17 +166,17 @@ class RtspServer {
 
     console.log(response);
     conn.write(response + "\r\n");
-  };
+  }
   private onConnClose = () => {
     console.log("connection from %s closed", "");
-  };
+  }
   private onConnError = (err: { message: any }) => {
     console.log("Connection %s error: %s", "", err.message);
-  };
+  }
 
   private getRemoteAddress = (conn: any): string => {
     return conn.remoteAddress.replace(/^.*:/, "");
-  };
+  }
 
   private generateSdp = () => {
     let sdp = "\r\n";
@@ -184,17 +186,17 @@ class RtspServer {
     sdp += "m=video 0 RTP/AVP 96\r\n";
     sdp += "a=rtpmap:96 H264/90000\r\n";
     return sdp;
-  };
+  }
 
   private getRandomInt = (min: number, max: number) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
+  }
 
   private rtspDate = () => {
     return "Date: " + new Date().toUTCString() + "\r\n";
-  };
+  }
 }
 
 export default new RtspServer();
