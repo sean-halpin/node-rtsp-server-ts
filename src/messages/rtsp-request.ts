@@ -3,10 +3,14 @@ export class RtspRequest {
   public messageType: string;
   public contentBase: string;
   private requestString: string;
+  public rtpPort: string;
+  public rtcpPort: string;
   constructor(request: Buffer) {
     this.requestString = request.toString("utf8");
     this.messageType = "";
     this.contentBase = "";
+    this.rtpPort = "";
+    this.rtcpPort = "";
     console.log("%s", this.requestString);
     this.decode();
   }
@@ -19,6 +23,19 @@ export class RtspRequest {
         this.headers.set(lines[i].split(": ")[0], lines[i].split(": ")[1]);
       }
     }
+    const transportHeader = this.getTransportHeader();
+    if (transportHeader !== undefined) {
+      const clientPorts = transportHeader
+        .toString()
+        .split(";")[2]
+        .split("=")[1];
+      this.rtpPort = clientPorts.split("-")[0];
+      this.rtcpPort = clientPorts.split("-")[1];
+    }
+  }
+
+  private getTransportHeader() {
+    return this.headers.get("Transport");
   }
 }
 export default RtspRequest;
