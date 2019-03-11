@@ -1,18 +1,21 @@
 export class RtspRequest {
-  public headers = new Map<string, string>();
   public messageType: string;
   public contentBase: string;
   public rtpPort: string;
   public rtcpPort: string;
   public streamIdentifer: string;
+  public sessionId: string;
+  public headers = new Map<string, string>();
   private requestString: string;
+
   constructor(request: Buffer) {
-    this.requestString = request.toString("utf8");
     this.messageType = "";
     this.contentBase = "";
     this.rtpPort = "";
     this.rtcpPort = "";
     this.streamIdentifer = "";
+    this.sessionId = "";
+    this.requestString = request.toString("utf8");
     console.log("%s", this.requestString);
     this.decode();
   }
@@ -35,10 +38,15 @@ export class RtspRequest {
       this.rtpPort = clientPorts.split("-")[0];
       this.rtcpPort = clientPorts.split("-")[1];
     }
-  };
-
+    const sessionHeader = this.getSessionHeader();
+    if (sessionHeader !== undefined) {
+      this.sessionId = sessionHeader;
+    }
+  }
   private getTransportHeader() {
     return this.headers.get("Transport");
   }
+  private getSessionHeader() {
+    return this.headers.get("Session");
+  }
 }
-export default RtspRequest;

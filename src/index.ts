@@ -1,4 +1,4 @@
-import rtspserver from './rtsp-server';
+import { RtspServer } from './rtsp-server';
 
-let server = rtspserver;
+let server = new RtspServer();
 server.startServer(8554);
