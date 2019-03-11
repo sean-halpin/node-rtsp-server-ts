@@ -1,4 +1,3 @@
-import * as shell from "shelljs";
 import { TcpServer } from "./tcp-server";
 import { RtspRequest } from "./messages/rtsp-request";
 import { RtspResponse } from "./messages/rtsp-response";
@@ -11,11 +10,16 @@ export class RtspServer {
   private sessionManager: RtspSessionManager;
   private gstreamerOrchestrator: GstreamerOrchestrator;
 
-  constructor() {
-    this.serverName = "NodeJS RTSP server";
-    this.tcpServer = new TcpServer();
-    this.sessionManager = new RtspSessionManager();
-    this.gstreamerOrchestrator = new GstreamerOrchestrator();
+  constructor(
+    serverName: string = "NodeJS RTSP server",
+    tcpServer: TcpServer = new TcpServer(),
+    sessionManager = new RtspSessionManager(),
+    gstreamerOrchestrator = new GstreamerOrchestrator()
+  ) {
+    this.serverName = serverName;
+    this.tcpServer = tcpServer;
+    this.sessionManager = sessionManager;
+    this.gstreamerOrchestrator = gstreamerOrchestrator;
   }
 
   public startServer(port: number) {
@@ -44,12 +48,10 @@ export class RtspServer {
         resp = rtspResponse.setup(newSession.sessionId);
         break;
       case "PLAY":
-        resp = rtspResponse.play();
-        const scriptCmd = this.gstreamerOrchestrator.gStreamerCmd(
+        this.gstreamerOrchestrator.play(
           this.sessionManager.getSession(rtspRequest.sessionId)
         );
-        console.log(scriptCmd);
-        shell.exec(scriptCmd, { async: true, silent: false });
+        resp = rtspResponse.play();
         break;
       case "TEARDOWN":
         resp = rtspResponse.teardown();

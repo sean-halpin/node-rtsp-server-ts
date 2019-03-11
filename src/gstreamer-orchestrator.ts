@@ -1,8 +1,17 @@
+import * as shell from "shelljs";
 import { RtspSession } from "./rtsp-session";
 export class GstreamerOrchestrator {
-  constructor() { }
+  constructor() {}
+
+  play(rtspSession: RtspSession): void {
+    const scriptCmd = this.gStreamerCmd(rtspSession);
+    console.log(scriptCmd);
+    shell.exec(scriptCmd, { async: true, silent: false });
+  }
+
   public gStreamerCmd(rtspSession: RtspSession): string {
-    return ("gst-launch-1.0 rtpbin name=rtpbin" +
+    return (
+      "gst-launch-1.0 rtpbin name=rtpbin" +
       " videotestsrc pattern=" +
       rtspSession.streamIdentifer +
       " !" +
@@ -15,6 +24,7 @@ export class GstreamerOrchestrator {
       rtspSession.clientRtcpPort +
       " host=" +
       rtspSession.clientHost +
-      " sync=false async=false");
+      " sync=false async=false"
+    );
   }
 }
