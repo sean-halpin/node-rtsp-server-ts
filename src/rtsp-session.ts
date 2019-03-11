@@ -1,6 +1,8 @@
 export interface RtspSession {
-    sessionId: string;
-    rtpPort: string;
-    rtcpPort: string;
+    sessionId?: string;
+    clientHost?: string;
+    clientRtpPort?: string;
+    clientRtcpPort?: string;
+    streamIdentifer?: string;
 }
 export default RtspSession;

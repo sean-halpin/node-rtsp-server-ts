@@ -36,45 +36,44 @@ class RtspServer {
   private onConnData = (req: Buffer, conn: net.Socket) => {
     let rtspRequest = new RtspRequest(req);
     let rtspResponse = new RtspResponse(rtspRequest, this.serverName);
-    let responseBody = "";
-
+    let resp = "";
     switch (rtspRequest.messageType) {
       case "OPTIONS":
-        responseBody = rtspResponse.options();
+        resp = rtspResponse.options();
         break;
       case "DESCRIBE":
-        responseBody = rtspResponse.describe();
+        resp = rtspResponse.describe();
         break;
       case "SETUP":
         const sessionId = this.randomSessionNumber(1, 999999).toString();
         let session: RtspSession = {
           sessionId: sessionId,
-          rtpPort: rtspRequest.rtpPort,
-          rtcpPort: rtspRequest.rtcpPort
+          clientHost: this.getRemoteAddress(conn),
+          clientRtpPort: rtspRequest.rtpPort,
+          clientRtcpPort: rtspRequest.rtcpPort,
+          streamIdentifer: rtspRequest.streamIdentifer
         };
         this.rtspSessions.set(sessionId, session);
-        responseBody = rtspResponse.setup(sessionId);
+        resp = rtspResponse.setup(sessionId);
         break;
       case "PLAY":
-        const streamIdentifer = rtspRequest.contentBase
-          .split("://")[1]
-          .split("/")[1];
-        responseBody = rtspResponse.play();
-
-        const scriptCmd = this.gStreamerCmd(streamIdentifer, rtspRequest);
+        resp = rtspResponse.play();
+        const scriptCmd = this.gStreamerCmd(
+          this.rtspSessions.get(rtspRequest.headers.get("Session") || "") ||
+            ({} as RtspSession)
+        );
         console.log(scriptCmd);
         shell.exec(scriptCmd, { async: true, silent: false });
         break;
       case "TEARDOWN":
-        responseBody = rtspResponse.teardown();
+        resp = rtspResponse.teardown();
         break;
       default:
-        responseBody = rtspResponse.notImplemented();
+        resp = rtspResponse.notImplemented();
         break;
     }
-
-    console.log(responseBody);
-    conn.write(responseBody + "\r\n");
+    console.log(resp);
+    conn.write(resp + "\r\n");
   }
   private onConnClose = (remoteAddress: string) => {
     console.log("connection from %s closed", remoteAddress);
@@ -82,32 +81,29 @@ class RtspServer {
   private onConnError = (err: any, remoteAddress: string) => {
     console.log("Connection %s error: %s", remoteAddress, err.message);
   }
-
   private getRemoteAddress = (conn: any): string => {
     return conn.remoteAddress.replace(/^.*:/, "");
   }
-
   private randomSessionNumber = (min: number, max: number) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-
-  private gStreamerCmd(
-    streamIdentifer: string,
-    rtspRequest: RtspRequest
-  ): string {
+  private gStreamerCmd(rtspSession: RtspSession): string {
     return (
-      "gst-launch-1.0 rtpbin name=rtpbin " +
-      "videotestsrc pattern=" +
-      streamIdentifer +
-      " ! " +
-      "video/x-raw,framerate=30/1 ! videoconvert ! x264enc ! rtph264pay ! rtpbin.send_rtp_sink_0 " +
-      "rtpbin.send_rtp_src_0 ! udpsink port=" +
-      this.rtspSessions.get(rtspRequest.headers.get("Session") || "")!.rtpPort +
+      "gst-launch-1.0 rtpbin name=rtpbin" +
+      " videotestsrc pattern=" +
+      rtspSession.streamIdentifer +
+      " !" +
+      " video/x-raw,framerate=30/1 ! videoconvert ! x264enc ! rtph264pay ! rtpbin.send_rtp_sink_0" +
+      " rtpbin.send_rtp_src_0 ! udpsink port=" +
+      rtspSession.clientRtpPort +
+      " host=" +
+      rtspSession.clientHost +
       " rtpbin.send_rtcp_src_0 ! udpsink port=" +
-      this.rtspSessions.get(rtspRequest.headers.get("Session") || "")!
-        .rtcpPort +
+      rtspSession.clientRtcpPort +
+      " host=" +
+      rtspSession.clientHost +
       " sync=false async=false"
     );
   }
