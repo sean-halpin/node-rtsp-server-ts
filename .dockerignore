@@ -1,0 +1,8 @@
+node_modules
+built
+test
+.gitignore
+.travis.yml
+.git
+tslint.json
+jest.config.js
