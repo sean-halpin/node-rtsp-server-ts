@@ -11,8 +11,8 @@ An RTSP Server written in Typescript, serving video with gstreamer.
 `docker run -p 8554:8554 -it rtsp-ts`
 
 ## Play Test Feed
-`sudo apt-get install ffmpeg`
-`ffplay rtsp:/0.0.0.0:8554/smpte`
-`ffplay rtsp:/0.0.0.0:8554/ball`
-`ffplay rtsp:/0.0.0.0:8554/snow`
-`ffplay rtsp:/0.0.0.0:8554/0`
+`sudo apt-get install ffmpeg`  
+`ffplay rtsp:/0.0.0.0:8554/smpte`  
+`ffplay rtsp:/0.0.0.0:8554/ball`  
+`ffplay rtsp:/0.0.0.0:8554/snow`  
+`ffplay rtsp:/0.0.0.0:8554/0`  
