@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     /* Build Pipeline String */
     gchar buffer[1024];
     g_snprintf(buffer, sizeof(buffer),
-               "rtpbin name=rtpbin "
+               "rtpbin name=rtpbin autoremove=true "
                "videotestsrc pattern=%s ! videoconvert ! x264enc ! rtph264pay ! rtpbin.send_rtp_sink_0 "
                "rtpbin.send_rtp_src_0 ! udpsink name=rtpudpsink host=%s port=%s "
                "rtpbin.send_rtcp_src_0 ! udpsink name=rtcpudpsink  host=%s port=%s sync=false async=false "

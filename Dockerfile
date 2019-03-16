@@ -13,19 +13,25 @@ RUN apt-get install --no-install-recommends -y \
     gstreamer1.0-plugins-good \
     gstreamer1.0-x \
     gstreamer1.0-libav \
-    gstreamer1.0-tools && \
-    apt-get clean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    gstreamer1.0-tools
+
+RUN apt-get install --no-install-recommends -y \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libglib2.0-dev
 
 RUN apt-get update
-RUN apt-get -y install gnupg
+RUN apt-get install -y gnupg
 RUN curl -sL https://deb.nodesource.com/setup_10.x  | bash -
-RUN apt-get -y install nodejs
-RUN apt-get -y install npm
+RUN apt-get install -y nodejs
+RUN apt-get install -y npm
+RUN apt-get install -y pkg-config
+
 RUN node -v && npm -v
 
 COPY ./ /rtsp-ts/
 WORKDIR /rtsp-ts/
+RUN npm config set registry http://registry.npmjs.org/  
 RUN npm install
 
 EXPOSE 8554
