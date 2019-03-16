@@ -14,6 +14,8 @@ export class MediaServer {
       "./launch " +
       rtspSession.streamIdentifer +
       " " +
+      rtspSession.clientHost +
+      " " +
       rtspSession.clientRtpPort +
       " " +
       rtspSession.clientRtcpPort +
