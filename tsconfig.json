@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
-      "baseUrl": ".",
-      "paths": { "*": ["types/*"] },
-      "baseUrl": ".",
-      "paths": { "*": ["types/*"] },
+    "baseUrl": ".",
+    "paths": { "*": ["types/*"] },
     "outDir": "built",
     "target": "es5", // Compatible with older browsers
     "module": "umd", // Compatible with both Node.js and browser

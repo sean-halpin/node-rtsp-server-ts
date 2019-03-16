@@ -3,5 +3,7 @@ export interface RtspSession {
     clientHost: string;
     clientRtpPort: string;
     clientRtcpPort: string;
+    serverRtpPort: string;
+    serverRtcpPort: string;
     streamIdentifer: string;
 }

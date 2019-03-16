@@ -2,24 +2,24 @@ import { TcpServer } from "./tcp-server";
 import { RtspRequest } from "./messages/rtsp-request";
 import { RtspResponse } from "./messages/rtsp-response";
 import { RtspSessionManager } from "./rtsp-session-manager";
-import { GstreamerOrchestrator } from "./gstreamer-orchestrator";
+import { MediaServer } from "./media-server";
 
 export class RtspServer {
   private serverName: string;
   private tcpServer: TcpServer;
   private sessionManager: RtspSessionManager;
-  private gstreamerOrchestrator: GstreamerOrchestrator;
+  private mediaServer: MediaServer;
 
   constructor(
     serverName: string = "NodeJS RTSP server",
     tcpServer: TcpServer = new TcpServer(),
     sessionManager = new RtspSessionManager(),
-    gstreamerOrchestrator = new GstreamerOrchestrator()
+    gstreamerOrchestrator = new MediaServer()
   ) {
     this.serverName = serverName;
     this.tcpServer = tcpServer;
     this.sessionManager = sessionManager;
-    this.gstreamerOrchestrator = gstreamerOrchestrator;
+    this.mediaServer = gstreamerOrchestrator;
   }
 
   public startServer(port: number) {
@@ -45,10 +45,14 @@ export class RtspServer {
           rtspRequest.rtcpPort,
           rtspRequest.streamIdentifer
         );
-        resp = rtspResponse.setup(newSession.sessionId);
+        resp = rtspResponse.setup(
+          newSession.sessionId,
+          newSession.serverRtpPort,
+          newSession.serverRtcpPort
+        );
         break;
       case "PLAY":
-        this.gstreamerOrchestrator.play(
+        this.mediaServer.play(
           this.sessionManager.getSession(rtspRequest.sessionId)
         );
         resp = rtspResponse.play();

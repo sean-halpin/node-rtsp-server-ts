@@ -38,9 +38,9 @@ describe("setup", function() {
     let actual = new RtspResponse(
       new RtspRequest(new Buffer(req)),
       "NodeJS RTSP server"
-    ).setup("DEADBEEF");
+    ).setup("DEADBEEF", "10000", "10001");
     let expected =
-      "RTSP/1.0 200 OK\r\nCSeq: 3\r\nTransport: RTP/AVP;unicast;client_port=16018-16019;mode=\"PLAY\"\r\nServer: NodeJS RTSP server\r\nSession: DEADBEEF\r\nDate: Mon, 11 Mar 2019 22:51:51 GMT\r\n";
+      'RTSP/1.0 200 OK\r\nCSeq: 3\r\nTransport: RTP/AVP;unicast;client_port=16018-16019;server_port=10000-10001;mode="PLAY"\r\nServer: NodeJS RTSP server\r\nSession: DEADBEEF\r\nDate: Mon, 11 Mar 2019 22:51:51 GMT\r\n';
     let regexDate = /Date.*GMT/;
     expect(actual.replace(regexDate, "")).toBe(expected.replace(regexDate, ""));
   });
