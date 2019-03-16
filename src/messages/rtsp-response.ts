@@ -33,7 +33,7 @@ export class RtspResponse {
     return body;
   }
 
-  public setup = (sessionId: string): string => {
+  public setup = (sessionId: string, serverRtpPort: string, servertRtcpPort: string): string => {
     let body = this.RTSP_200;
     body += "CSeq: " + this.request.headers.get("CSeq") + "\r\n";
     body +=
@@ -41,7 +41,12 @@ export class RtspResponse {
       this.request.rtpPort +
       "-" +
       this.request.rtcpPort +
-      ';mode="PLAY"\r\n';
+      ";server_port=" +
+      serverRtpPort +
+      "-" +
+      servertRtcpPort +
+      ";" +
+      'mode="PLAY"\r\n';
     body += "Server: " + this.serverName + "\r\n";
     body += "Session: " + sessionId + "\r\n";
     body += this.rtspDate();
