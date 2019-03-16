@@ -66,5 +66,5 @@ export class RtspServer {
     }
     console.log(resp);
     return resp;
-  };
+  }
 }
