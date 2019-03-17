@@ -2,18 +2,18 @@ import * as net from "net";
 
 export class TcpServer {
   private server: net.Server;
-  private processRtspRequest: Function;
+  private processRequest: Function;
 
   constructor() {
     this.server = net.createServer();
-    this.processRtspRequest = (request: Buffer): string => {
+    this.processRequest = (request: Buffer, remoteAddress: string): string => {
       return "";
     };
     this.server.on("connection", this.handleConnection);
   }
 
   public startServer(port: number, onRequest: Function) {
-    this.processRtspRequest = onRequest;
+    this.processRequest = onRequest;
     this.server.listen(port, () => {
       return console.log("listening on port %s", port);
     });
@@ -35,7 +35,7 @@ export class TcpServer {
     conn: net.Socket,
     remoteAddress: string
   ) => {
-    let response = this.processRtspRequest(req, remoteAddress);
+    let response = this.processRequest(req, remoteAddress);
     conn.write(response + "\r\n");
   }
   private onConnClose = (remoteAddress: string) => {
