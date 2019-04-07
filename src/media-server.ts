@@ -11,7 +11,9 @@ export class MediaServer {
 
   private beginRtpSession(rtspSession: RtspSession): string {
     return (
-      "./launch " +
+      "echo play " +
+      rtspSession.sessionId +
+      " " +
       rtspSession.streamIdentifer +
       " " +
       rtspSession.clientHost +
@@ -20,7 +22,8 @@ export class MediaServer {
       " " +
       rtspSession.clientRtcpPort +
       " " +
-      rtspSession.serverRtcpPort
+      rtspSession.serverRtcpPort +
+      " | netcat 127.0.0.1 7878"
     );
   }
 }
