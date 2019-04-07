@@ -12,7 +12,7 @@ An RTSP Server written in Typescript, serving video with gstreamer.
 
 ## Play Test Feed
 `sudo apt-get install ffmpeg`  
-`ffplay rtsp:/0.0.0.0:8554/smpte`  
-`ffplay rtsp:/0.0.0.0:8554/ball`  
-`ffplay rtsp:/0.0.0.0:8554/snow`  
-`ffplay rtsp:/0.0.0.0:8554/0`  
+`ffplay rtsp://0.0.0.0:8554/smpte`  
+`ffplay rtsp://0.0.0.0:8554/ball`  
+`ffplay rtsp://0.0.0.0:8554/snow`  
+`ffplay rtsp://0.0.0.0:8554/0`  
