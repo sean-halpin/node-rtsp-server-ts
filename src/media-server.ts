@@ -12,6 +12,8 @@ export class MediaServer {
   private beginRtpSession(rtspSession: RtspSession): string {
     return (
       "echo play " +
+      rtspSession.sessionId +
+      " " +
       rtspSession.streamIdentifer +
       " " +
       rtspSession.clientHost +
