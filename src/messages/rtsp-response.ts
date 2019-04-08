@@ -16,6 +16,7 @@ export class RtspResponse {
     body += "Public: OPTIONS, DESCRIBE, PLAY, SETUP, TEARDOWN\r\n";
     body += "Server: " + this.serverName + "\r\n";
     body += this.rtspDate();
+    console.log(body);
     return body;
   }
 
@@ -30,10 +31,15 @@ export class RtspResponse {
     body += this.rtspDate();
     body += "Content-Length: " + sdpLengthInBytes + "\r\n";
     body += sdp;
+    console.log(body);
     return body;
   }
 
-  public setup = (sessionId: string, serverRtpPort: string, servertRtcpPort: string): string => {
+  public setup = (
+    sessionId: string,
+    serverRtpPort: string,
+    servertRtcpPort: string
+  ): string => {
     let body = this.RTSP_200;
     body += "CSeq: " + this.request.headers.get("CSeq") + "\r\n";
     body +=
@@ -50,6 +56,7 @@ export class RtspResponse {
     body += "Server: " + this.serverName + "\r\n";
     body += "Session: " + sessionId + "\r\n";
     body += this.rtspDate();
+    console.log(body);
     return body;
   }
 
@@ -64,6 +71,17 @@ export class RtspResponse {
     body += "Server: " + this.serverName + "\r\n";
     body += "Session: " + this.request.headers.get("Session") + "\r\n";
     body += this.rtspDate();
+    console.log(body);
+    return body;
+  }
+
+  public pause = (): string => {
+    let body = this.RTSP_200;
+    body += "CSeq: " + this.request.headers.get("CSeq") + "\r\n";
+    body += "Server: " + this.serverName + "\r\n";
+    body += "Session: " + this.request.headers.get("Session") + "\r\n";
+    body += this.rtspDate();
+    console.log(body);
     return body;
   }
 
@@ -74,6 +92,7 @@ export class RtspResponse {
     body += "Session: " + this.request.headers.get("Session") + "\r\n";
     body += "Connection: close\r\n";
     body += this.rtspDate();
+    console.log(body);
     return body;
   }
 
@@ -82,6 +101,7 @@ export class RtspResponse {
     body += "CSeq: " + this.request.headers.get("CSeq") + "\r\n";
     body += "Server: " + this.serverName + "\r\n";
     body += this.rtspDate();
+    console.log(body);
     return body;
   }
 
