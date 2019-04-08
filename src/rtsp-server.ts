@@ -30,14 +30,11 @@ export class RtspServer {
   private handleRtspRequest = (request: Buffer, remoteAddress: string) => {
     let rtspRequest = new RtspRequest(request);
     let rtspResponse = new RtspResponse(rtspRequest, this.serverName);
-    let resp = "";
     switch (rtspRequest.messageType) {
       case "OPTIONS":
-        resp = rtspResponse.options();
-        break;
+        return rtspResponse.options();
       case "DESCRIBE":
-        resp = rtspResponse.describe();
-        break;
+        return rtspResponse.describe();
       case "SETUP":
         let newSession = this.sessionManager.createSession(
           remoteAddress,
@@ -45,26 +42,28 @@ export class RtspServer {
           rtspRequest.rtcpPort,
           rtspRequest.streamIdentifer
         );
-        resp = rtspResponse.setup(
+        return rtspResponse.setup(
           newSession.sessionId,
           newSession.serverRtpPort,
           newSession.serverRtcpPort
         );
-        break;
       case "PLAY":
         this.mediaServer.play(
           this.sessionManager.getSession(rtspRequest.sessionId)
         );
-        resp = rtspResponse.play();
-        break;
+        return rtspResponse.play();
+      case "PAUSE":
+        this.mediaServer.pause(
+          this.sessionManager.getSession(rtspRequest.sessionId)
+        );
+        return rtspResponse.pause();
       case "TEARDOWN":
-        resp = rtspResponse.teardown();
-        break;
+        this.mediaServer.teardown(
+          this.sessionManager.getSession(rtspRequest.sessionId)
+        );
+        return rtspResponse.teardown();
       default:
-        resp = rtspResponse.notImplemented();
-        break;
+        return rtspResponse.notImplemented();
     }
-    console.log(resp);
-    return resp;
   }
 }
